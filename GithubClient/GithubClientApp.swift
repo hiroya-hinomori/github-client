@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct GithubClientApp: App {
+    let gat = Bundle.main.object(forInfoDictionaryKey: "GAT") as! String
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(token: gat)
         }
     }
 }

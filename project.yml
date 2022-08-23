@@ -1,0 +1,61 @@
+name: GithubClient
+options:
+  deploymentTarget:
+    iOS: 14.0
+  xcodeVersion: "13.4"
+  bundleIdPrefix: com.exam
+settings:
+  MARKETING_VERSION: 0.0.1
+  CURRENT_PROJECT_VERSION: 1
+packages:
+  Moya:
+    url: https://github.com/Moya/Moya.git
+    minorVersion: 15.0.0
+targets:
+  GithubClient:
+    type: application
+    platform: iOS
+    settings:
+      base:
+        ENABLE_PREVIEWS: true
+        GENERATE_INFOPLIST_FILE: true
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: true
+        INFOPLIST_KEY_UILaunchScreen_Generation: true
+        OTHER_LDFLAGS: $(inherited) -ObjC
+        TARGETED_DEVICE_FAMILY: 1
+    sources:
+      - GithubClient
+    scheme:
+      testTargets:
+        - GithubClientTests
+        - GithubClientUITests
+      gatherCoverageData: true
+    postBuildScripts:
+      - name: Run Script(Github Access Token)
+        shell: /bin/sh
+        script: |
+          token_file=./.github-access-token
+          token="$(cat $token_file 2>/dev/null)"
+          if [ "$token" ]; then
+            plutil -replace GAT -string $token "$TARGET_BUILD_DIR/$INFOPLIST_PATH"
+          else
+            echo 'warning: Missing Github Access Token'
+          fi
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
+          - ./.github-access-token
+  GithubClientTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: GithubClientTests
+    dependencies:
+      - target: GithubClient
+  GithubClientUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: GithubClientUITests
+    dependencies:
+      - target: GithubClient
