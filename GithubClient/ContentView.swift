@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Domain
 
 struct ContentView: View {
     @ObservedObject var interactor: Interactor

@@ -1,21 +1,21 @@
 //
 //  Repository.swift
-//  GithubClient
+//  Domain
 //
 //  Created by 日野森 寛也（Hiroya Hinomori） on 2022/08/24.
 //
 
 import Foundation
 
-struct Repositories: Decodable {
-    struct Repository: Decodable {
-        let url: URL
-        let name: String
+public struct Repositories: Decodable {
+    public struct Repository: Decodable {
+        public let url: URL
+        public let name: String
     }
     
-    let list: [Repository]
+    public let list: [Repository]
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         enum RootKeys: String, CodingKey {
             case data
         }

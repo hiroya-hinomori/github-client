@@ -27,8 +27,7 @@ targets:
     sources:
       - GithubClient
     dependencies:
-      - package: Moya
-        product: Moya
+      - target: Domain
     scheme:
       testTargets:
         - GithubClientTests
@@ -62,3 +61,25 @@ targets:
       - path: GithubClientUITests
     dependencies:
       - target: GithubClient
+  Domain:
+    type: framework
+    platform: iOS
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: true
+    sources:
+      - Domain
+    dependencies:
+      - package: Moya
+        product: Moya
+    scheme:
+      testTargets:
+        - DomainTests
+  DomainTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: DomainTests
+    dependencies:
+      - target: Domain
+ 

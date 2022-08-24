@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 class Interactor: ObservableObject {
     @Published var userName = ""
