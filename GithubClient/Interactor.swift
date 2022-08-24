@@ -12,9 +12,9 @@ class Interactor: ObservableObject {
     @Published var userName = ""
     @Published var list: [Repositories.Repository] = []
     
-    let networkService: NetworkService
+    let networkService: NetworkServiceProtocol
     
-    init(networkService: NetworkService) {
+    init(networkService: NetworkServiceProtocol) {
         self.networkService = networkService
     }
 

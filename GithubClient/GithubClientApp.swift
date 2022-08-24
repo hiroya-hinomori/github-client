@@ -14,7 +14,7 @@ struct GithubClientApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(interactor: .init(networkService: .init(token: gat)))
+            ContentView(interactor: .init(networkService: NetworkService(token: gat)))
         }
     }
 }

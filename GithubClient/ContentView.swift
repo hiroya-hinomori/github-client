@@ -43,6 +43,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(interactor: .init(networkService: .init(token: "hoge")))
+        ContentView(interactor: .init(networkService: NetworkService(token: "hoge")))
     }
 }

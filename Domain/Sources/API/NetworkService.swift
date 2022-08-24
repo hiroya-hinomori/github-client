@@ -8,7 +8,7 @@
 import Foundation
 import Moya
 
-public struct NetworkService {
+public struct NetworkService: NetworkServiceProtocol {
     let provider: MoyaProvider<GitHubRouter>
     let token: String
     
