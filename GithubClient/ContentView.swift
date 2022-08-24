@@ -8,16 +8,40 @@
 import SwiftUI
 
 struct ContentView: View {
-    let token: String
+    @ObservedObject var interactor: Interactor
     
     var body: some View {
-        Text(token)
-            .padding()
+        VStack {
+            Text(interactor.userName)
+                .padding()
+            List(interactor.list, id: \.url) {
+                ListItemView(repository: $0)
+            }
+        }
+        .onAppear {
+            interactor.fetchLoginUser()
+        }
+        .onReceive(interactor.$userName) { _ in
+            interactor.fetchRepositories()
+        }
+    }
+    
+    struct ListItemView: View {
+        let repository: Repositories.Repository
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(repository.name)
+                    .font(.largeTitle)
+                Text(repository.url.description)
+                    .font(.caption)
+            }
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(token: "hoge")
+        ContentView(interactor: .init(networkService: .init(token: "hoge")))
     }
 }

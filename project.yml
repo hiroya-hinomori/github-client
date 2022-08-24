@@ -26,6 +26,9 @@ targets:
         TARGETED_DEVICE_FAMILY: 1
     sources:
       - GithubClient
+    dependencies:
+      - package: Moya
+        product: Moya
     scheme:
       testTargets:
         - GithubClientTests
