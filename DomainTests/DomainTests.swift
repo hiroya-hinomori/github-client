@@ -33,4 +33,8 @@ class DomainTests: XCTestCase {
         }
     }
 
+    func test_stub() {
+        let stub = StubNetworkService()
+        stub.requestLoginUserName { print($0) }
+    }
 }

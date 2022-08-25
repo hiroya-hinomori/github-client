@@ -31,7 +31,6 @@ targets:
     scheme:
       testTargets:
         - GithubClientTests
-        - GithubClientUITests
       gatherCoverageData: true
     postBuildScripts:
       - name: Run Script(Github Access Token)
@@ -50,17 +49,14 @@ targets:
   GithubClientTests:
     type: bundle.unit-test
     platform: iOS
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: true
     sources:
       - path: GithubClientTests
     dependencies:
       - target: GithubClient
-  GithubClientUITests:
-    type: bundle.ui-testing
-    platform: iOS
-    sources:
-      - path: GithubClientUITests
-    dependencies:
-      - target: GithubClient
+      - target: Domain
   Domain:
     type: framework
     platform: iOS
@@ -68,7 +64,8 @@ targets:
       base:
         GENERATE_INFOPLIST_FILE: true
     sources:
-      - Domain
+      - path: Domain
+        name: Domain
     dependencies:
       - package: Moya
         product: Moya
@@ -78,6 +75,9 @@ targets:
   DomainTests:
     type: bundle.unit-test
     platform: iOS
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: true
     sources:
       - path: DomainTests
     dependencies:
