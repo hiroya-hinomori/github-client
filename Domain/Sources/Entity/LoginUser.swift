@@ -1,16 +1,16 @@
 //
 //  LoginUser.swift
-//  GithubClient
+//  Domain
 //
 //  Created by 日野森 寛也（Hiroya Hinomori） on 2022/08/24.
 //
 
 import Foundation
 
-struct LoginUser: Decodable {
-    let name: String
+public struct LoginUser: Decodable {
+    public let name: String
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         enum RootKeys: String, CodingKey {
             case data
         }

@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import Domain
 
 struct ContentView: View {
+    let githubAccessToken: String
     @ObservedObject var interactor: Interactor
     
     var body: some View {
@@ -19,10 +21,10 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            interactor.fetchLoginUser()
+            interactor.fetchLoginUser(with: githubAccessToken)
         }
         .onReceive(interactor.$userName) { _ in
-            interactor.fetchRepositories()
+            interactor.fetchRepositories(with: githubAccessToken)
         }
     }
     
@@ -42,6 +44,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(interactor: .init(networkService: .init(token: "hoge")))
+        ContentView(githubAccessToken: "hoge", interactor: .init(networkService: StubNetworkService()))
     }
 }

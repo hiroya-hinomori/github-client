@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Domain
 
 @main
 struct GithubClientApp: App {
@@ -13,7 +14,7 @@ struct GithubClientApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(interactor: .init(networkService: .init(token: gat)))
+            ContentView(githubAccessToken: gat, interactor: .init(networkService: NetworkService()))
         }
     }
 }

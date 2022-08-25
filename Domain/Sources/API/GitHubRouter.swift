@@ -1,6 +1,6 @@
 //
 //  GitHubRouter.swift
-//  GithubClient
+//  Domain
 //
 //  Created by 日野森 寛也（Hiroya Hinomori） on 2022/08/24.
 //
