@@ -33,8 +33,32 @@ class DomainTests: XCTestCase {
         }
     }
 
-    func test_stub() {
+    func test_stub_username() {
         let stub = StubNetworkService()
-        stub.requestLoginUserName { print($0) }
+        stub.request(Connection.GraphQL.LoginUserTarget(token: "")) {
+            if case .success(let value) = $0 {
+                XCTAssertEqual(value.name, "hoge-taro")
+            } else {
+                XCTFail()
+            }
+        }
+    }
+    
+    func test_stub_repositories() {
+        let stub = StubNetworkService()
+        let ref = [
+            Repositories.Repository(url: .init(string: "https://hoge.co.jp")!, name: "hoge"),
+            Repositories.Repository(url: .init(string: "https://huga.co.jp")!, name: "huga"),
+            Repositories.Repository(url: .init(string: "https://fuga.co.jp")!, name: "fuga"),
+            Repositories.Repository(url: .init(string: "https://foga.co.jp")!, name: "foga"),
+            Repositories.Repository(url: .init(string: "https://tiga.co.jp")!, name: "tiga"),
+        ]
+        stub.request(Connection.GraphQL.RepositoriesTarget(token: "")) {
+            if case .success(let list) = $0 {
+                XCTAssertEqual(list.list, ref)
+            } else {
+                XCTFail()
+            }
+        }
     }
 }

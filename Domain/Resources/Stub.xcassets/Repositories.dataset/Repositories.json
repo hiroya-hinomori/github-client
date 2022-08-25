@@ -1,0 +1,30 @@
+{
+    "data": {
+        "viewer": {
+            "repositories": {
+                "nodes": [
+                    {
+                        "name": "hoge",
+                        "url": "https://hoge.co.jp"
+                    },
+                    {
+                        "name": "huga",
+                        "url": "https://huga.co.jp"
+                    },
+                    {
+                        "name": "fuga",
+                        "url": "https://fuga.co.jp"
+                    },
+                    {
+                        "name": "foga",
+                        "url": "https://foga.co.jp"
+                    },
+                    {
+                        "name": "tiga",
+                        "url": "https://tiga.co.jp"
+                    }
+                ]
+            }
+        }
+    }
+}

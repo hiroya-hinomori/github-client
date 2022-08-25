@@ -8,7 +8,7 @@
 import Foundation
 
 public struct Repositories: Decodable {
-    public struct Repository: Decodable {
+    public struct Repository: Decodable, Equatable {
         public let url: URL
         public let name: String
     }

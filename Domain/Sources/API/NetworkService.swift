@@ -8,39 +8,31 @@
 import Foundation
 import Moya
 
-public struct NetworkService: NetworkServiceProtocol {
-    let provider: MoyaProvider<GitHubRouter>
-    let token: String
-    
-    public init(token: String) {
-        provider = .init()
-        self.token = token
-    }
-    
-    public func requestLoginUserName(_ completion: @escaping (Result<LoginUser, Error>) -> ()) {
-        let githubRouter = GitHubRouter(token: token, type: .loginName)
-        provider.request(githubRouter) { result in
-            switch result {
-            case .success(let response):
-                completion(.success(try! JSONDecoder().decode(LoginUser.self, from: response.data)))
-                break
-            case .failure(let error):
-                completion(.failure(error))
-                break
-            }
-        }
-    }
-    
-    public func requestRepository(_ completion: @escaping (Result<Repositories, Error>) -> ()) {
-        let githubRouter = GitHubRouter(token: token, type: .repogitories)
-        provider.request(githubRouter) { result in
-            switch result {
-            case .success(let response):
-                completion(.success(try! JSONDecoder().decode(Repositories.self, from: response.data)))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
+public enum Connection {
+    public enum GraphQL { }
+}
 
+public struct NetworkService: NetworkServiceProtocol {
+    let provider: MoyaProvider<AbstractTarget> = .init()
+
+    public init() { }
+    
+    public func request<R>(_ target: R, completion: @escaping (Result<R.Response, Error>) -> Void) where R: BaseTarget {
+        let abstractTarget = AbstractTarget(target, sampleData: nil, baseURL: nil)
+        let decoder = JSONDecoder()
+        provider
+            .request(abstractTarget) {
+                switch $0 {
+                case .success(let response):
+                    do {
+                        let decodeData = try decoder.decode(R.Response.self, from: response.data)
+                        completion(.success(decodeData))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+    }
 }

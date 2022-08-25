@@ -6,20 +6,29 @@
 //
 
 import Foundation
-import UIKit
+import Moya
 
 struct StubNetworkService: NetworkServiceProtocol {
     class Ancher { }
     
-    let bundle = Bundle(for: Ancher.self)
+    let provider = MoyaProvider<AbstractTarget>(stubClosure: MoyaProvider.immediatelyStub)
     
-    func requestLoginUserName(_ completion: @escaping (Result<LoginUser, Error>) -> ()) {
-        let asset = NSDataAsset(name: "LoginUser", bundle: bundle)
-        let json = try! JSONSerialization.jsonObject(with: asset!.data, options: .fragmentsAllowed)
-        print(json)
-    }
-    
-    func requestRepository(_ completion: @escaping (Result<Repositories, Error>) -> ()) {
-        
+    func request<R>(_ target: R, completion: @escaping (Result<R.Response, Error>) -> Void) where R : BaseTarget {
+        let abstractTarget = AbstractTarget(target, sampleData: nil, baseURL: nil)
+        let decoder = JSONDecoder()
+        provider
+            .request(abstractTarget) {
+                switch $0 {
+                case .success(let response):
+                    do {
+                        let decodeData = try decoder.decode(R.Response.self, from: response.data)
+                        completion(.success(decodeData))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
     }
 }

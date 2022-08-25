@@ -18,27 +18,34 @@ class Interactor: ObservableObject {
         self.networkService = networkService
     }
 
-    func fetchLoginUser() {
+    func fetchLoginUser(with token: String) {
         networkService
-            .requestLoginUserName {
-                switch $0 {
-                case .success(let user):
-                    self.userName = user.name
-                case .failure(let error):
-                    print(error)
+            .request(
+                Connection.GraphQL.LoginUserTarget(token: token),
+                completion: {
+                    switch $0 {
+                    case .success(let user):
+                        self.userName = user.name
+                    case .failure(let error):
+                        print(error)
+                    }
                 }
-            }
+            )
     }
     
-    func fetchRepositories() {
+    func fetchRepositories(with token: String) {
         networkService
-            .requestRepository {
-                switch $0 {
-                case .success(let repo):
-                    self.list = repo.list
-                case .failure(let error):
-                    print(error)
+            .request(
+                Connection.GraphQL.RepositoriesTarget(token: token),
+                completion: {
+                    switch $0 {
+                    case .success(let repo):
+                        self.list = repo.list
+                    case .failure(let error):
+                        print(error)
+                    }
+
                 }
-            }
+            )
     }
 }

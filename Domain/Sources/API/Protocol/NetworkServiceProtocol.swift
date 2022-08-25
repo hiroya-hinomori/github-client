@@ -8,6 +8,5 @@
 import Foundation
 
 public protocol NetworkServiceProtocol {
-    func requestLoginUserName(_ completion: @escaping (Result<LoginUser, Error>) -> ())
-    func requestRepository(_ completion: @escaping (Result<Repositories, Error>) -> ())
+    func request<R: BaseTarget>(_ target: R, completion: @escaping (Result<R.Response, Error>) -> Void)
 }
