@@ -40,6 +40,7 @@ extension Connection.GraphQL {
                                 nodes {
                                     name
                                     url
+                                    isPrivate
                                 }
                             }
                         }

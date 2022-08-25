@@ -33,11 +33,17 @@ struct ContentView: View {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 10) {
-                Text(repository.name)
-                    .font(.largeTitle)
+                HStack(alignment: .top) {
+                    Text(repository.name)
+                        .font(.largeTitle)
+                    Spacer()
+                    Image(systemName: repository.isPrivate ? "lock" : "lock.open")
+                        .frame(width: 30, height: 20, alignment: .center)
+                }
                 Text(repository.url.description)
                     .font(.caption)
             }
+            .padding(.init(top: 5, leading: 0, bottom: 0, trailing: 0))
         }
     }
 }

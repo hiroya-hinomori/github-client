@@ -11,6 +11,7 @@ public struct Repositories: Decodable {
     public struct Repository: Decodable, Equatable {
         public let url: URL
         public let name: String
+        public let isPrivate: Bool
     }
     
     public let list: [Repository]

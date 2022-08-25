@@ -5,23 +5,28 @@
                 "nodes": [
                     {
                         "name": "hoge",
-                        "url": "https://hoge.co.jp"
+                        "url": "https://hoge.co.jp",
+                        "isPrivate": true
                     },
                     {
                         "name": "huga",
-                        "url": "https://huga.co.jp"
+                        "url": "https://huga.co.jp",
+                        "isPrivate": false
                     },
                     {
                         "name": "fuga",
-                        "url": "https://fuga.co.jp"
+                        "url": "https://fuga.co.jp",
+                        "isPrivate": true
                     },
                     {
                         "name": "foga",
-                        "url": "https://foga.co.jp"
+                        "url": "https://foga.co.jp",
+                        "isPrivate": false
                     },
                     {
                         "name": "tiga",
-                        "url": "https://tiga.co.jp"
+                        "url": "https://tiga.co.jp",
+                        "isPrivate": true
                     }
                 ]
             }
