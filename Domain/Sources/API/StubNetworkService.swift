@@ -8,12 +8,12 @@
 import Foundation
 import Moya
 
-struct StubNetworkService: NetworkServiceProtocol {
-    class Ancher { }
-    
+public struct StubNetworkService: NetworkServiceProtocol {
     let provider = MoyaProvider<AbstractTarget>(stubClosure: MoyaProvider.immediatelyStub)
     
-    func request<R>(_ target: R, completion: @escaping (Result<R.Response, Error>) -> Void) where R : BaseTarget {
+    public init() { }
+    
+    public func request<R>(_ target: R, completion: @escaping (Result<R.Response, Error>) -> Void) where R : BaseTarget {
         let abstractTarget = AbstractTarget(target, sampleData: nil, baseURL: nil)
         let decoder = JSONDecoder()
         provider
