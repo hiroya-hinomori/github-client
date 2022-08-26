@@ -23,7 +23,7 @@ struct ContentView: View {
                                 isShowingAlert = true
                             }
                     } else {
-                        NavigationLink(destination: Text(item.name)) {
+                        NavigationLink(destination: WebView(url: item.url)) {
                             ListItemView(repository: item)
                         }
                     }
