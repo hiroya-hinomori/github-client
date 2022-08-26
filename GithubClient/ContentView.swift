@@ -11,14 +11,26 @@ import Domain
 struct ContentView: View {
     let githubAccessToken: String
     @ObservedObject var interactor: Interactor
-    
+    @State var isShowingAlert = false
+  
     var body: some View {
         VStack {
-            Text(interactor.userName)
-                .padding()
-            List(interactor.list, id: \.url) {
-                ListItemView(repository: $0)
+            NavigationView {
+                List(interactor.list.reversed(), id: \.url) { item in
+                    if item.isPrivate {
+                        ListItemView(repository: item)
+                            .onTapGesture {
+                                isShowingAlert = true
+                            }
+                    } else {
+                        NavigationLink(destination: Text(item.name)) {
+                            ListItemView(repository: item)
+                        }
+                    }
+                 }
+                .navigationBarTitle(interactor.userName)
             }
+
         }
         .onAppear {
             interactor.fetchLoginUser(with: githubAccessToken)
@@ -26,8 +38,11 @@ struct ContentView: View {
         .onReceive(interactor.$userName) { _ in
             interactor.fetchRepositories(with: githubAccessToken)
         }
+        .alert(isPresented: self.$isShowingAlert) {
+            Alert(title: .init("This repository is private."))
+        }
     }
-    
+
     struct ListItemView: View {
         let repository: Repositories.Repository
 
