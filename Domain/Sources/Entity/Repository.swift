@@ -7,14 +7,20 @@
 
 import Foundation
 
+public protocol RepositoryType {
+    var url: URL { get }
+    var name: String { get }
+    var isPrivate: Bool { get }
+}
+
 public struct Repositories: Decodable {
-    public struct Repository: Decodable, Equatable {
+    public struct Repository: Decodable, Equatable, RepositoryType {
         public let url: URL
         public let name: String
         public let isPrivate: Bool
     }
     
-    public let list: [Repository]
+    public let list: [RepositoryType]
     
     public init(from decoder: Decoder) throws {
         enum RootKeys: String, CodingKey {

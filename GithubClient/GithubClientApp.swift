@@ -11,10 +11,23 @@ import Domain
 @main
 struct GithubClientApp: App {
     let gat = Bundle.main.object(forInfoDictionaryKey: "GAT") as! String
+    let networkService = NetworkService()
     
     var body: some Scene {
         WindowGroup {
-            ContentView(githubAccessToken: gat, interactor: .init(networkService: NetworkService()))
+            RootView(
+                store: .init(
+                    initialState: .init(
+                        userName: "",
+                        repositoryList: []
+                    ),
+                    reducer: rootReducer,
+                    environment: .init(
+                        accessToken: gat,
+                        interactor: .init(networkService: networkService)
+                    )
+                )
+            )
         }
     }
 }
