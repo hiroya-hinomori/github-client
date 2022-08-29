@@ -17,12 +17,15 @@ struct RootState: Equatable {
     
     var userName: String
     var repositoryList: [RepositoryType]
+    var alert: AlertState<RootAction>?
 }
 
 enum RootAction {
     case viewDidAppear
     case fetchedUserName(TaskResult<String>)
     case fetchedRepositories(TaskResult<[RepositoryType]>)
+    case tappedPrivateRepository(RepositoryType)
+    case dismissAlert
 }
 
 struct RootEnvironment {
@@ -69,6 +72,16 @@ let rootReducer = Reducer<
             print(error)
         }
         return .none
+    case .tappedPrivateRepository(let repo):
+        state.alert = .init(
+            title: .init(repo.name),
+            message: .init("This is Private repository."),
+            dismissButton: .cancel(.init("OK"))
+        )
+        return .none
+    case .dismissAlert:
+        state.alert = nil
+        return .none
     }
 }
 
@@ -84,12 +97,16 @@ struct RootView: View {
                     ListItemView(repository: repository)
                         .onTapGesture {
                             print(repository.name)
+                            if repository.isPrivate {
+                                viewStore.send(.tappedPrivateRepository(repository))
+                            }
                         }
                 }
             }
             .onAppear {
                 viewStore.send(.viewDidAppear)
             }
+            .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
         }
     }
 
