@@ -9,43 +9,44 @@ import Foundation
 import Domain
 
 class Interactor: ObservableObject {
-    @Published var userName = ""
-    @Published var list: [Repositories.Repository] = []
-    
     let networkService: NetworkServiceProtocol
     
     init(networkService: NetworkServiceProtocol) {
         self.networkService = networkService
     }
-
-    func fetchLoginUser(with token: String) {
-        networkService
-            .request(
-                Connection.GraphQL.LoginUserTarget(token: token),
-                completion: {
-                    switch $0 {
-                    case .success(let user):
-                        self.userName = user.name
-                    case .failure(let error):
-                        print(error)
-                    }
-                }
-            )
-    }
     
-    func fetchRepositories(with token: String) {
-        networkService
-            .request(
-                Connection.GraphQL.RepositoriesTarget(token: token),
-                completion: {
-                    switch $0 {
-                    case .success(let repo):
-                        self.list = repo.list
-                    case .failure(let error):
-                        print(error)
+    func fetchAsyncLoginUser(with token: String) async throws -> String {
+        try await withCheckedThrowingContinuation { continuation in
+            networkService
+                .request(
+                    Connection.GraphQL.LoginUserTarget(token: token),
+                    completion: {
+                        switch $0 {
+                        case .success(let user):
+                            continuation.resume(returning: user.name)
+                        case .failure(let error):
+                            continuation.resume(throwing: error)
+                        }
                     }
+                )
+        }
+    }
 
-                }
-            )
+    func fetchAsyncRepositories(with token: String) async throws -> [RepositoryType] {
+        try await withCheckedThrowingContinuation { continuation in
+            networkService
+                .request(
+                    Connection.GraphQL.RepositoriesTarget(token: token),
+                    completion: {
+                        switch $0 {
+                        case .success(let repo):
+                            continuation.resume(returning: repo.list)
+                        case .failure(let error):
+                            continuation.resume(throwing: error)
+                        }
+
+                    }
+                )
+        }
     }
 }
