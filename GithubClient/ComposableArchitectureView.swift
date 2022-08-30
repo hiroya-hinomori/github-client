@@ -1,44 +1,44 @@
 //
-//  RootView.swift
+//  ComposableArchitectureView.swift
 //  GithubClient
 //
-//  Created by 日野森 寛也（Hiroya Hinomori） on 2022/08/26.
+//  Created by 日野森 寛也（Hiroya Hinomori） on 2022/08/30.
 //
 
 import ComposableArchitecture
 import SwiftUI
 import Domain
 
-struct RootState: Equatable {
-    static func == (lhs: RootState, rhs: RootState) -> Bool {
+struct ComposableArchitectureState: Equatable {
+    static func == (lhs: ComposableArchitectureState, rhs: ComposableArchitectureState) -> Bool {
         return lhs.userName == rhs.userName &&
         lhs.repositoryList.count == rhs.repositoryList.count
     }
     
     var userName: String
     var repositoryList: [RepositoryType]
-    var isNavigationActive = false
     var selectionRepository: RepositoryType?
-    var alert: AlertState<RootAction>?
+    var alert: AlertState<ComposableArchitectureAction>?
 }
 
-enum RootAction {
+enum ComposableArchitectureAction {
     case viewDidAppear
+    case browse
     case fetchedUserName(TaskResult<String>)
     case fetchedRepositories(TaskResult<[RepositoryType]>)
     case setNavigation(URL?)
     case dismissAlert
 }
 
-struct RootEnvironment {
+struct ComposableArchitectureEnvironment {
     let accessToken: String
     let interactor: Interactor
 }
 
-let rootReducer = Reducer<
-    RootState,
-    RootAction,
-    RootEnvironment
+let composableArchitectureReducer = Reducer<
+    ComposableArchitectureState,
+    ComposableArchitectureAction,
+    ComposableArchitectureEnvironment
 > { state, action, environment in
     switch action {
     case .viewDidAppear:
@@ -49,6 +49,8 @@ let rootReducer = Reducer<
                     .fetchAsyncLoginUser(with: environment.accessToken)
             })
         }
+    case .browse:
+        return .none
     case .fetchedUserName(let result):
         switch result {
         case .success(let value):
@@ -74,7 +76,7 @@ let rootReducer = Reducer<
             print(error)
         }
         return .none
-    case .setNavigation(.some(let url)):
+    case .setNavigation(let url):
         if let targetRepository = state.repositoryList.first(where: { $0.url == url }) {
             if targetRepository.isPrivate {
                 state.alert = .init(
@@ -87,16 +89,14 @@ let rootReducer = Reducer<
             }
         }
         return .none
-    case .setNavigation(.none):
-        return .none
     case .dismissAlert:
         state.alert = nil
         return .none
     }
 }
 
-struct RootView: View {
-    let store: Store<RootState, RootAction>
+struct ComposableArchitectureView: View {
+    let store: Store<ComposableArchitectureState, ComposableArchitectureAction>
     var body: some View {
         WithViewStore(store) { viewStore in
             Form {
@@ -106,10 +106,18 @@ struct RootView: View {
                 ) { repository in
                     NavigationLink(
                         destination: WebView(url: repository.url),
+//                        destination: IfLetStore(
+//                          self.store.scope(
+//                            state: \.selectionRepository?.url
+//                            action: RootAction.browse
+//                          )
+//                        ) { _ in
+//                            WebView(url: repository.url)
+//                        },
                         tag: repository.url,
                         selection: viewStore.binding(
                             get: \.selectionRepository?.url,
-                            send: RootAction.setNavigation(_:)
+                            send: ComposableArchitectureAction.setNavigation(_:)
                         )
                     ) {
                         ListItemView(repository: repository)
@@ -126,16 +134,16 @@ struct RootView: View {
 
 }
 
-struct RootView_Previews: PreviewProvider {
+struct ComposableArchitectureView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            RootView(
+            ComposableArchitectureView(
                 store: .init(
                     initialState: .init(
                         userName: "hoge",
                         repositoryList: []
                     ),
-                    reducer: rootReducer,
+                    reducer: composableArchitectureReducer,
                     environment: .init(
                         accessToken: "fuga",
                         interactor: .init(networkService: StubNetworkService())

@@ -15,21 +15,22 @@ struct GithubClientApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                RootView(
-                    store: .init(
-                        initialState: .init(
-                            userName: "",
-                            repositoryList: []
-                        ),
-                        reducer: rootReducer,
-                        environment: .init(
-                            accessToken: gat,
-                            interactor: .init(networkService: networkService)
-                        )
-                    )
-                )
-            }
+            AppView(gat: gat, networkService: networkService)
+//            NavigationView {
+//                RootView(
+//                    store: .init(
+//                        initialState: .init(
+//                            userName: "",
+//                            repositoryList: []
+//                        ),
+//                        reducer: rootReducer,
+//                        environment: .init(
+//                            accessToken: gat,
+//                            interactor: .init(networkService: networkService)
+//                        )
+//                    )
+//                )
+//            }
         }
     }
 }
