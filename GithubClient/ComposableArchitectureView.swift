@@ -103,32 +103,21 @@ struct ComposableArchitectureView: View {
                 ForEach(
                     viewStore.repositoryList.reversed(),
                     id: \.url
-                ) { repository in
-                    NavigationLink(
-                        destination: WebView(url: repository.url),
-//                        destination: IfLetStore(
-//                          self.store.scope(
-//                            state: \.selectionRepository?.url
-//                            action: RootAction.browse
-//                          )
-//                        ) { _ in
-//                            WebView(url: repository.url)
-//                        },
-                        tag: repository.url,
-                        selection: viewStore.binding(
-                            get: \.selectionRepository?.url,
-                            send: ComposableArchitectureAction.setNavigation(_:)
-                        )
-                    ) {
-                        ListItemView(repository: repository)
-                    }
+                ) {
+                    ListItemView(
+                        repository: .init(
+                            url: $0.url,
+                            name: $0.name,
+                            isPrivate: $0.isPrivate
+                        ),
+                        destination: WebView(url: $0.url)
+                    )
                 }
                 .navigationTitle(viewStore.userName)
             }
             .onAppear {
                 viewStore.send(.viewDidAppear)
             }
-            .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
         }
     }
 
