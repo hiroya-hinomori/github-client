@@ -27,18 +27,7 @@ struct ListItemView<V: View>: View {
             tag: repository,
             selection: $openRepository
         ) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top) {
-                    Text(repository.name)
-                        .font(.largeTitle)
-                    Spacer()
-                    Image(systemName: repository.isPrivate ? "lock" : "lock.open")
-                        .frame(width: 30, height: 20, alignment: .center)
-                }
-                Text(repository.url.description)
-                    .font(.caption)
-            }
-            .padding(.init(top: 5, leading: 0, bottom: 0, trailing: 0))
+            Content(repository: repository)
         }
         .alert(
             isPresented: $isShowingAlert,
@@ -54,6 +43,25 @@ struct ListItemView<V: View>: View {
             } else {
                 openRepository = repository
             }
+        }
+    }
+    
+    struct Content: View {
+        let repository: Repository
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .top) {
+                    Text(repository.name)
+                        .font(.largeTitle)
+                    Spacer()
+                    Image(systemName: repository.isPrivate ? "lock" : "lock.open")
+                        .frame(width: 30, height: 20, alignment: .center)
+                }
+                Text(repository.url.description)
+                    .font(.caption)
+            }
+            .padding(.init(top: 5, leading: 0, bottom: 0, trailing: 0))
         }
     }
 }
