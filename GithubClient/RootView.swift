@@ -17,6 +17,7 @@ struct RootState: Equatable {
     
     var userName: String
     var repositoryList: [RepositoryType]
+    var isNavigationActive = false
     var alert: AlertState<RootAction>?
 }
 
@@ -24,6 +25,7 @@ enum RootAction {
     case viewDidAppear
     case fetchedUserName(TaskResult<String>)
     case fetchedRepositories(TaskResult<[RepositoryType]>)
+    case setNavigation(isActive: Bool)
     case tappedPrivateRepository(RepositoryType)
     case dismissAlert
 }
@@ -72,6 +74,12 @@ let rootReducer = Reducer<
             print(error)
         }
         return .none
+    case .setNavigation(let isActive) where isActive == true:
+        print("### \(isActive)")
+        return .none
+    case .setNavigation(let isActive):
+        print("$$$ \(isActive)")
+        return .none
     case .tappedPrivateRepository(let repo):
         state.alert = .init(
             title: .init(repo.name),
@@ -94,14 +102,17 @@ struct RootView: View {
                     viewStore.repositoryList.reversed(),
                     id: \.url
                 ) { repository in
-                    ListItemView(repository: repository)
-                        .onTapGesture {
-                            print(repository.name)
-                            if repository.isPrivate {
-                                viewStore.send(.tappedPrivateRepository(repository))
-                            }
-                        }
+                    NavigationLink(
+                        destination: WebView(url: repository.url),
+                        isActive: viewStore.binding(
+                            get: \.isNavigationActive,
+                            send: RootAction.setNavigation(isActive:)
+                        )
+                    ) {
+                        ListItemView(repository: repository)
+                    }
                 }
+                .navigationTitle(viewStore.userName)
             }
             .onAppear {
                 viewStore.send(.viewDidAppear)
@@ -114,18 +125,20 @@ struct RootView: View {
 
 struct RootView_Previews: PreviewProvider {
     static var previews: some View {
-        RootView(
-            store: .init(
-                initialState: .init(
-                    userName: "hoge",
-                    repositoryList: []
-                ),
-                reducer: rootReducer,
-                environment: .init(
-                    accessToken: "fuga",
-                    interactor: .init(networkService: StubNetworkService())
+        NavigationView {
+            RootView(
+                store: .init(
+                    initialState: .init(
+                        userName: "hoge",
+                        repositoryList: []
+                    ),
+                    reducer: rootReducer,
+                    environment: .init(
+                        accessToken: "fuga",
+                        interactor: .init(networkService: StubNetworkService())
+                    )
                 )
             )
-        )
+        }
     }
 }
