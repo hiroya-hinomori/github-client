@@ -18,6 +18,7 @@ struct RootState: Equatable {
     var userName: String
     var repositoryList: [RepositoryType]
     var isNavigationActive = false
+    var selectionRepository: RepositoryType?
     var alert: AlertState<RootAction>?
 }
 
@@ -25,8 +26,7 @@ enum RootAction {
     case viewDidAppear
     case fetchedUserName(TaskResult<String>)
     case fetchedRepositories(TaskResult<[RepositoryType]>)
-    case setNavigation(isActive: Bool)
-    case tappedPrivateRepository(RepositoryType)
+    case setNavigation(URL?)
     case dismissAlert
 }
 
@@ -74,18 +74,20 @@ let rootReducer = Reducer<
             print(error)
         }
         return .none
-    case .setNavigation(let isActive) where isActive == true:
-        print("### \(isActive)")
+    case .setNavigation(.some(let url)):
+        if let targetRepository = state.repositoryList.first(where: { $0.url == url }) {
+            if targetRepository.isPrivate {
+                state.alert = .init(
+                    title: .init(targetRepository.name),
+                    message: .init("This is Private repository."),
+                    dismissButton: .cancel(.init("OK"))
+                )
+            } else {
+                state.selectionRepository = targetRepository
+            }
+        }
         return .none
-    case .setNavigation(let isActive):
-        print("$$$ \(isActive)")
-        return .none
-    case .tappedPrivateRepository(let repo):
-        state.alert = .init(
-            title: .init(repo.name),
-            message: .init("This is Private repository."),
-            dismissButton: .cancel(.init("OK"))
-        )
+    case .setNavigation(.none):
         return .none
     case .dismissAlert:
         state.alert = nil
@@ -104,9 +106,10 @@ struct RootView: View {
                 ) { repository in
                     NavigationLink(
                         destination: WebView(url: repository.url),
-                        isActive: viewStore.binding(
-                            get: \.isNavigationActive,
-                            send: RootAction.setNavigation(isActive:)
+                        tag: repository.url,
+                        selection: viewStore.binding(
+                            get: \.selectionRepository?.url,
+                            send: RootAction.setNavigation(_:)
                         )
                     ) {
                         ListItemView(repository: repository)
