@@ -13,20 +13,25 @@ struct RepositoryListView: View {
     let store: Store<RepositoryListStore.State, RepositoryListStore.Action>
     var body: some View {
         WithViewStore(store) { viewStore in
-            Form {
-                ForEach(viewStore.rows) { row in
-                    NavigationLink(
-                        destination: WebView(url: row.repository.url),
-                        tag: row.id,
-                        selection: viewStore.binding(
-                            get: \.selection?.id,
-                            send: RepositoryListStore.Action.setNavigation(id:)
-                        )
-                    ) {
-                        ListItemView(repository: row.repository)
+            ZStack {
+                Form {
+                    ForEach(viewStore.rows) { row in
+                        NavigationLink(
+                            destination: WebView(url: row.repository.url),
+                            tag: row.id,
+                            selection: viewStore.binding(
+                                get: \.selection?.id,
+                                send: RepositoryListStore.Action.setNavigation(id:)
+                            )
+                        ) {
+                            ListItemView(repository: row.repository)
+                        }
                     }
+                    .navigationTitle(viewStore.userName ?? "")
                 }
-                .navigationTitle(viewStore.userName)
+                if viewStore.isShowIndicator {
+                    LoadingView()
+                }
             }
             .alert(
                 store.scope(state: \.alert?.state),
@@ -45,7 +50,8 @@ struct RepositoryListView_Previews: PreviewProvider {
             RepositoryListView(
                 store: .init(
                     initialState: .init(
-                        userName: "hoge"
+                        userName: "hoge",
+                        isShowIndicator: false
                     ),
                     reducer: RepositoryListStore.reducer,
                     environment: .init(

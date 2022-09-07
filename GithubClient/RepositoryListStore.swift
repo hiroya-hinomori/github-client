@@ -14,7 +14,6 @@ enum RepositoryListStore {
             static func == (lhs: RepositoryListStore.State.AlertStatus, rhs: RepositoryListStore.State.AlertStatus) -> Bool {
                 lhs.state.id == rhs.state.id
             }
-            
             let state: AlertState<Action>
         }
         
@@ -22,15 +21,15 @@ enum RepositoryListStore {
             static func == (lhs: State.Row, rhs: State.Row) -> Bool {
                 return lhs.id == rhs.id
             }
-            
             var repository: RepositoryType
             let id: UUID
         }
 
-        var userName: String = ""
+        var userName: String?
         var rows: IdentifiedArrayOf<Row> = []
         var selection: Identified<Row.ID, URL>?
         var alert: AlertStatus?
+        var isShowIndicator = false
     }
 
     enum Action {
@@ -48,10 +47,16 @@ enum RepositoryListStore {
         let interactor: Interactor
     }
     
+    enum Error: Swift.Error {
+        case apiError
+        case accessForbidden(name: String)
+    }
+    
     static let reducer = Reducer<State, Action, Environment> { state, action, environment in
         enum CancelID {}
         switch action {
         case .onAppear:
+            state.isShowIndicator = true
             return .task {
                 await .fetchedUserName(.init {
                     try await environment
@@ -75,31 +80,28 @@ enum RepositoryListStore {
                 }
                 .cancellable(id: CancelID.self, cancelInFlight: true)
             case let .failure(error):
-                return .task(operation: { .failure(error) })
+                return .task(operation: { .failure(.apiError) })
             }
         case let .fetchedRepositories(result):
             switch result {
             case let .success(list):
                 let rows = list.reversed().map { State.Row(repository: $0, id: .init()) }
                 state.rows = .init(uniqueElements: rows)
+                state.isShowIndicator = false
             case let .failure(error):
-                return .task(operation: { .failure(error) })
+                return .task(operation: { .failure(.apiError) })
             }
             return .none
         case let .setNavigation(.some(id)):
-            guard let target = state.rows[id: id] else { return .none }
-            if target.repository.isPrivate {
-                state.alert = .init(
-                    state: .init(
-                        title: .init(target.repository.name),
-                        message: .init("This is Private repository.")
+            if let target = state.rows.first(where: { $0.id == id }) {
+                if target.repository.isPrivate {
+                    return .task { .failure(.accessForbidden(name: target.repository.name)) }
+                } else {
+                    state.selection = .init(
+                        target.repository.url,
+                        id: id
                     )
-                )
-            } else {
-                state.selection = .init(
-                    target.repository.url,
-                    id: id
-                )
+                }
             }
             return .none
         case .setNavigation(.none):
@@ -109,7 +111,23 @@ enum RepositoryListStore {
             state.alert = nil
             return .none
         case let .failure(error):
-            print(error)
+            state.isShowIndicator = false
+            switch error {
+            case .apiError:
+                state.alert = .init(
+                    state: .init(
+                        title: .init("API ERROR"),
+                        message: .init("Access Failed.")
+                    )
+                )
+            case let .accessForbidden(name):
+                state.alert = .init(
+                    state: .init(
+                        title: .init(name),
+                        message: .init("This is Private repository.")
+                    )
+                )
+            }
             return .none
         }
     }
