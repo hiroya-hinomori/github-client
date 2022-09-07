@@ -15,21 +15,7 @@ struct GithubClientApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                ComposableArchitectureView(
-                    store: .init(
-                        initialState: .init(
-                            userName: "",
-                            repositoryList: []
-                        ),
-                        reducer: composableArchitectureReducer,
-                        environment: .init(
-                            accessToken: gat,
-                            interactor: .init(networkService: networkService)
-                        )
-                    )
-                )
-            }
+            RootView(gat: gat, networkService: networkService)
         }
     }
 }

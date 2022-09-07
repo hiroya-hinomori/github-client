@@ -8,79 +8,48 @@
 import Domain
 import SwiftUI
 
-struct ListItemView<V: View>: View {
-    struct Repository: RepositoryType, Hashable {
-        var url: URL
-        var name: String
-        var isPrivate: Bool
-    }
+struct ListItemView: View {
+    let repository: RepositoryType
     
-    let repository: Repository
-    let destination: V
-    
-    @State private var isShowingAlert = false
-    @State private var openRepository: Repository?
-
     var body: some View {
-        NavigationLink(
-            destination: destination,
-            tag: repository,
-            selection: $openRepository
-        ) {
-            Content(repository: repository)
-        }
-        .alert(
-            isPresented: $isShowingAlert,
-            content: {
-                .init(
-                    title: .init(repository.name),
-                    message: .init("This repository is Private🔐")
-                )
-            })
-        .onTapGesture {
-            if repository.isPrivate {
-                isShowingAlert = true
-            } else {
-                openRepository = repository
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                Text(repository.name)
+                    .font(.largeTitle)
+                Spacer()
+                Image(systemName: repository.isPrivate ? "lock" : "lock.open")
+                    .frame(width: 30, height: 20, alignment: .center)
             }
+            Text(repository.url.description)
+                .font(.caption)
         }
-    }
-    
-    struct Content: View {
-        let repository: Repository
-        
-        var body: some View {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top) {
-                    Text(repository.name)
-                        .font(.largeTitle)
-                    Spacer()
-                    Image(systemName: repository.isPrivate ? "lock" : "lock.open")
-                        .frame(width: 30, height: 20, alignment: .center)
-                }
-                Text(repository.url.description)
-                    .font(.caption)
-            }
-            .padding(.init(top: 5, leading: 0, bottom: 0, trailing: 0))
-        }
+        .padding(.init(top: 5, leading: 0, bottom: 0, trailing: 0))
     }
 }
 
 struct ListItemView_Previews: PreviewProvider {
+    struct Repository: RepositoryType {
+        var url: URL
+        var name: String
+        var isPrivate: Bool
+    }
     static var previews: some View {
         ListItemView(
-            repository: .init(
-                url: .init(string: "https://hogehoge.co.jp")!,
-                name: "hoge-jiro",
+            repository: Repository(
+                url: .init(string: "https://hoge.com")!,
+                name: "hoge.com",
                 isPrivate: true
-            ),
-            destination: Text("hoge"))
+            )
+        )
+        .previewLayout(.sizeThatFits)
         ListItemView(
-            repository: .init(
-                url: .init(string: "https://hogehoge.co.jp")!,
-                name: "hoge-saburo",
+            repository: Repository(
+                url: .init(string: "https://hoge.com")!,
+                name: "hoge.com",
                 isPrivate: false
-            ),
-            destination: Text("hoge"))
+            )
+        )
+        .previewLayout(.sizeThatFits)
+
     }
 }

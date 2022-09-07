@@ -7,6 +7,7 @@
 
 import SwiftUI
 import WebKit
+import ComposableArchitecture
 
 struct WebView: UIViewRepresentable {
     let url: URL
@@ -17,5 +18,50 @@ struct WebView: UIViewRepresentable {
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
         uiView.load(URLRequest(url: url))
+    }
+}
+
+struct TCAWebViewState: Equatable {
+    var url: URL
+}
+
+enum TCAWebViewAction: Equatable {
+    case browse
+}
+
+struct TCAWebViewEnvironment { }
+
+let webViewReducer = Reducer<
+    TCAWebViewState,
+    TCAWebViewAction,
+    TCAWebViewEnvironment
+> { state, action, environment in
+    switch action {
+    case .browse:
+        return .none
+    }
+}
+
+struct TCAWebView: View {
+    let store: Store<TCAWebViewState, TCAWebViewAction>
+    
+    var body: some View {
+        WithViewStore(store) { viewStore in
+            WebView(url: viewStore.url)
+        }
+    }
+    
+}
+
+struct TCAWebView_Previews: PreviewProvider {
+    static var previews: some View {
+        TCAWebView(
+            store: .init(
+                initialState: .init(url: .init(string: "https://yahoo.co.jp")!),
+                reducer: webViewReducer,
+                environment: .init()
+            )
+        )
+        .previewLayout(.sizeThatFits)
     }
 }

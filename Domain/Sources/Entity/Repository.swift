@@ -20,7 +20,7 @@ public struct Repositories: Decodable {
         public let isPrivate: Bool
     }
     
-    public let list: [RepositoryType]
+    public let list: [Repository]
     
     public init(from decoder: Decoder) throws {
         enum RootKeys: String, CodingKey {
