@@ -1,5 +1,5 @@
 //
-//  HomeView.swift
+//  IfLetStoreView.swift
 //  GithubClient
 //
 //  Created by 日野森 寛也（Hiroya Hinomori） on 2022/08/30.
@@ -9,8 +9,8 @@ import ComposableArchitecture
 import SwiftUI
 import Domain
 
-struct HomeView: View {
-    let store: Store<HomeStore.State, HomeStore.Action>
+struct IfLetStoreView: View {
+    let store: Store<IfLetStoreStore.State, IfLetStoreStore.Action>
     var body: some View {
         WithViewStore(store) { viewStore in
             Form {
@@ -19,7 +19,7 @@ struct HomeView: View {
                         destination: IfLetStore(
                             self.store.scope(
                                 state: \.selection?.value,
-                                action: HomeStore.Action.browse
+                                action: IfLetStoreStore.Action.browse
                             )
                         ) {
                             TCAWebView(store: $0)
@@ -27,7 +27,7 @@ struct HomeView: View {
                         tag: row.id,
                         selection: viewStore.binding(
                             get: \.selection?.id,
-                            send: HomeStore.Action.setNavigation(id:)
+                            send: IfLetStoreStore.Action.setNavigation(id:)
                         )
                     ) {
                         ListItemView(repository: row.repository)
@@ -46,15 +46,15 @@ struct HomeView: View {
     }
 }
 
-struct HomeView_Previews: PreviewProvider {
+struct IfLetStoreView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            HomeView(
+            IfLetStoreView(
                 store: .init(
                     initialState: .init(
                         userName: "hoge"
                     ),
-                    reducer: HomeStore.reducer,
+                    reducer: IfLetStoreStore.reducer,
                     environment: .init(
                         accessToken: "fuga",
                         interactor: .init(networkService: StubNetworkService())

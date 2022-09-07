@@ -31,10 +31,10 @@ struct RootView: View {
                 }
 
                 NavigationLink(destination: {
-                    HomeView(
+                    IfLetStoreView(
                         store: .init(
                             initialState: .init(),
-                            reducer: HomeStore.reducer.debug(),
+                            reducer: IfLetStoreStore.reducer.debug(),
                             environment: .init(
                                 accessToken: gat,
                                 interactor: .init(networkService: networkService)

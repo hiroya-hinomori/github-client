@@ -8,10 +8,10 @@
 import ComposableArchitecture
 import Domain
 
-enum HomeStore {
+enum IfLetStoreStore {
     struct State: Equatable {
         struct AlertStatus: Equatable {
-            static func == (lhs: HomeStore.State.AlertStatus, rhs: HomeStore.State.AlertStatus) -> Bool {
+            static func == (lhs: IfLetStoreStore.State.AlertStatus, rhs: IfLetStoreStore.State.AlertStatus) -> Bool {
                 lhs.state.id == rhs.state.id
             }
             
